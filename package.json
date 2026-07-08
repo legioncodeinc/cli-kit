@@ -4,6 +4,14 @@
   "description": "Zero-dependency CLI mechanism kit for the Apiary CLI suite",
   "type": "module",
   "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/legioncodeinc/cli-kit.git"
+  },
+  "homepage": "https://github.com/legioncodeinc/cli-kit#readme",
+  "bugs": {
+    "url": "https://github.com/legioncodeinc/cli-kit/issues"
+  },
   "engines": {
     "node": ">=22.5.0"
   },
