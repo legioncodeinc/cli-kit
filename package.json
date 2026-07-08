@@ -1,6 +1,6 @@
 {
   "name": "@legioncodeinc/cli-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Zero-dependency CLI mechanism kit for the Apiary CLI suite",
   "type": "module",
   "license": "AGPL-3.0-or-later",
