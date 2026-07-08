@@ -25,7 +25,7 @@ const notes = existsSync("RELEASE_NOTES.md")
 const description = notes.length > 4000 ? notes.slice(0, 3990) + "\n…" : notes;
 
 const payload = {
-  username: "hive releases",
+  username: "cli-kit releases",
   embeds: [
     {
       title: `${pkg} v${version}`,
