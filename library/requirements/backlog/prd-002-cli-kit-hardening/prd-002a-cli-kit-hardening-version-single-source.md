@@ -37,16 +37,17 @@
 
 ## Implementation notes
 
-Two viable approaches, pick one in review:
+A build step reads `package.json.version` and substitutes it into the emitted `VERSION` (e.g. an esbuild `define`, or a generated `version.ts` produced before `tsc`), matching the org's `sync-versions` pattern referenced elsewhere in the suite. This keeps the runtime read-free — no file read at import time, unlike a `readPackageVersion()`-based approach.
 
-1. **Build-time inject** (preferred, matches the org's `sync-versions` pattern referenced elsewhere in the suite): a small build step reads `package.json.version` and substitutes it into the emitted `VERSION` (e.g. an esbuild `define`, or a generated `version.ts` produced before `tsc`). Keeps the runtime read-free.
-2. **Runtime read**: resolve the package's own `package.json` via `import.meta.url` + `node:fs` and read `version` once at module load. Simpler, but adds a file read at import time — acceptable given it is one small read, but less clean than inject.
+The stale literal in `src/index.ts:34` and its misleading doc-comment must be removed, and the doc-comment must describe the actual (build-time) mechanism.
 
-Whichever is chosen, the stale literal in `src/index.ts:34` and its misleading doc-comment must be removed, and the doc-comment must describe the actual mechanism.
+## Resolved decisions
+
+- **Approach → build-time inject** (2026-07-12), not a runtime read. Zero import-time file-read cost, and consistent with the suite's existing `sync-versions` convention. Note this means the kit's own `VERSION` fix does **not** dogfood `002j`'s `readPackageVersion()` helper — that helper remains available for consumers who prefer (or need) a runtime read, but the kit's own build uses inject.
 
 ## Open questions
 
-- [ ] Build-time inject vs runtime read — decide in review. (Inject preferred for import-time purity.)
+- None.
 
 ## Related
 
