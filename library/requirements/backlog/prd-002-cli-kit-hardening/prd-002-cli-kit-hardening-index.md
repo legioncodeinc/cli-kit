@@ -136,14 +136,22 @@ Each sub-feature is its own PR + changeset in the `cli-kit` repo, governed by th
 Resolved 2026-07-12:
 
 - **`002i` migration strategy → move + symlink fallback.** Move legacy dirs into `~/.apiary/` on next start; symlink legacy → new when a move is blocked by open handles, with a logged deprecation warning, completing on a later clean start. (See `002i` AC-i5.)
-- **`002d` shim policy → grep first, then decide.** Run the cross-repo grep for reliance on Doctor's `EXIT_DECLINED=2`; ship the deprecated `LEGACY_EXIT_DECLINED` compat shim **only if** a real dependency exists, otherwise document-only. (See `002d` AC-d3/AC-d4.)
+- **`002d` shim policy → no shim, ever.** Regardless of what the cross-repo grep for reliance on Doctor's `EXIT_DECLINED=2` finds, the kit does not ship a bridging/deprecated compat export. The migration note + release-notes callout is the entire mitigation. (See `002d` AC-d3/AC-d4.)
 - **`002i` `APIARY_HOME` override → in scope, still home-anchored.** Supported, but subject to the same "never a system directory" refusal — an override cannot escape the guarantee. (See `002i` AC-i8.)
+- **`002i` migration trigger → one-shot invocations only.** The legacy-directory move is gated by `002c`'s `isOneShot()`; a daemon/watchdog invocation never triggers it, which is also what resolves the "must a service stop first" concern. (See `002i` AC-i9 — `002i` now depends on `002c`.)
+- **`002i` subpath names → keep today's names as-is.** `daemon/`, `deeplake/`, `honeycomb/` under `~/.apiary/`, unchanged from their legacy top-level names.
+- **`002b` `FinalizeDeps` → exported publicly.** Consumers testing their own exit path can type-check fakes against it.
+- **`002c` default watchdog set → `["run"]`.** Matches Doctor's precedent; extensible via `options.watchdogCommands`.
+- **`002f` contract + parity audit → both vendored and shipped in the npm tarball.** Resolvable `@see` links for npm-only consumers, not just GitHub browsers.
+- **`002g` color coupling → separate `setJsonMode()` at bootstrap**, not an `emitJson()` side effect. **Output shape → caller-owned, no envelope** in v1.
+- **`002h` confirm default → decline, with default-yes as an explicit per-call opt-in.** `assumeYes` comes from the CLI's own `--yes`/`--force` flag only — no env var.
+- **`002j` return type → `string | undefined`.**
+- **`002l` scope → declaration maps only**, no runtime source maps in v1.
+- **`002m` SBOM location → GitHub release asset only**, not shipped in the npm tarball.
 
 ## Open questions
 
-- [ ] `002i`: whether any service must run *before* the daemon can be safely stopped, which decides exactly which invocations trigger a move vs. defer to a clean start.
-- [ ] `002i`: final subpath namespace map (`daemon/` vs `runtime/daemon/`, etc.) — settle with each service owner.
-- [ ] `002d`: if the grep finds a dependency, the shim's removal target (which major).
+- None. Every open question across the index and all 13 sub-PRDs was resolved during PRD authoring (2026-07-12); see each sub-PRD's "Resolved decisions" section for the reasoning behind each call.
 
 ---
 

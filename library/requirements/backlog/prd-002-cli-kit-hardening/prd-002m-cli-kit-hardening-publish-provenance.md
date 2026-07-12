@@ -41,9 +41,13 @@ PRD-001 flagged supply-chain hardening as a SHOULD in its Versioning section: *"
 
 Add `--provenance` to the publish step in the release workflow (requires `id-token: write` in the GitHub Actions job). Set `publishConfig.provenance` + `access` in `package.json`. Generate the SBOM with a CycloneDX tool in CI (e.g. `@cyclonedx/cyclonedx-npm`) and attach it. Because `dependencies` is empty, the SBOM is minimal — keep it that way as a supply-chain feature.
 
+## Resolved decisions
+
+- **SBOM location → GitHub release asset only** (2026-07-12). Keeps the npm tarball lean, which matters given the kit's zero-dependency selling point; anyone auditing supply chain finds the SBOM attached to the release. Not included in the npm tarball.
+
 ## Open questions
 
-- [ ] Attach the SBOM as a GitHub release asset, include it in the npm tarball, or both? Leaning release asset to keep the tarball lean.
+- None.
 
 ## Related
 

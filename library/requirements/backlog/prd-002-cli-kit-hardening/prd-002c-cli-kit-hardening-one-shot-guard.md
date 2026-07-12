@@ -51,9 +51,13 @@ export function isOneShot(
 
 Take the first token of `argv` (the command), compare against the watchdog set. This composes with `002i`'s no-throw discipline — guard input defensively.
 
+## Resolved decisions
+
+- **Default watchdog set → `["run"]`** (2026-07-12). Matches Doctor's existing precedent; consumers extend the list via `options.watchdogCommands` when their own verb table differs. Reflected in AC-c2.
+
 ## Open questions
 
-- [ ] Should the default watchdog set be empty (force each consumer to declare) or `["run"]` (Doctor's precedent)? Leaning `["run"]` with the option to extend, since `run`/`start`/`daemon` recur across the suite.
+- None.
 
 ## Related
 

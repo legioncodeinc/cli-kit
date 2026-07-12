@@ -39,9 +39,13 @@
 
 Resolve the file path from `import.meta.url` (`fileURLToPath`), walk up to the nearest `package.json`, `JSON.parse`, return `version`. Cache per-URL if called repeatedly. Keep it total (no throws). Note the interaction with `002a`: if `002a` picks build-time inject for the kit itself, this helper still ships for consumers; if `002a` picks runtime-read, it should reuse this helper.
 
+## Resolved decisions
+
+- **Return type → `string | undefined`** (2026-07-12). Ergonomic call site (`const v = readPackageVersion(url) ?? "unknown"`), matching how most small utilities in the kit already behave. No `{ ok, version } | { ok: false, error }` result type in v1.
+
 ## Open questions
 
-- [ ] Return `string | undefined` vs a `{ ok, version } | { ok: false, error }` result? Leaning `string | undefined` for ergonomics, with a documented default.
+- None.
 
 ## Related
 

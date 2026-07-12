@@ -54,10 +54,14 @@ interface ConfirmOptions {
 
 Accept `y/yes/n/no` case-insensitively. Always close the readline interface. This pairs with `002d` — a decline is contract-`0`, so the docs must route it through `declined()`.
 
+## Resolved decisions
+
+- **Default answer policy → decline by default, default-yes as an explicit per-call opt-in** (2026-07-12). The library's own baseline (`options.default` unset) is decline; a specific low-stakes prompt may pass `{ default: true }` to opt into default-yes. Safe-by-default, with an escape hatch where the UX calls for it.
+- **`assumeYes` source → option only, no env var** (2026-07-12). The CLI wires `assumeYes` from its own `--yes`/`--force` flag parsing. No `APIARY_YES`-style hidden global that could silently change behavior across unrelated invocations.
+
 ## Open questions
 
-- [ ] Default answer policy — always default-decline unless the caller opts into default-yes? (Leaning yes: safe-by-default.)
-- [ ] Should `confirm` read `assumeYes` from an env var too (e.g. `APIARY_YES`), or strictly from the passed option? Leaning option-only to avoid hidden global state.
+- None.
 
 ## Related
 

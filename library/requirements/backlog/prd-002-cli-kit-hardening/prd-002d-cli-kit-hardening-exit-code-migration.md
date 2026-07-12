@@ -16,12 +16,13 @@ This sub-PRD makes that change safe and explicit: document it as a breaking beha
 ## Goals
 
 - No adopter is surprised by the `declined 2 → 0` change.
-- Doctor's migration is a documented, mechanical step with a compatibility option.
+- Doctor's migration is a documented, mechanical step — a clean break, not a lingering compatibility shim to maintain.
 
 ## Non-Goals
 
 - Re-introducing `EXIT_DECLINED = 2`. The `0` behavior is the intended contract; this sub-PRD does not reverse it.
 - Rewriting Doctor's dispatcher wholesale — only the exit-code seam and its tests.
+- **Providing any compat/legacy export.** Resolved (2026-07-12): the kit does not ship a bridging `LEGACY_EXIT_DECLINED` or similar, under any grep outcome. The migration note is the entire mitigation.
 
 ## User stories
 
@@ -34,21 +35,22 @@ This sub-PRD makes that change safe and explicit: document it as a breaking beha
 |---|---|
 | AC-d1 | An adoption/migration note (in the kit's docs and its CHANGELOG) explicitly flags `declined` moving from `2` (Doctor's `EXIT_DECLINED`) to `0`, with a before/after example. |
 | AC-d2 | The note lists the concrete Doctor touch-points: remove `EXIT_DECLINED`, route declines through `declined()`, and update tests asserting `2`. |
-| AC-d3 | A grep-backed check across consumer repos determines whether anything depends on `EXIT_DECLINED=2`; the finding is recorded in the note. |
-| AC-d4 | If (and only if) a real dependency on `2` is found, a clearly-labeled, deprecated compat export (e.g. `LEGACY_EXIT_DECLINED = 2`) is provided as a temporary bridge, with a removal target. |
+| AC-d3 | A grep-backed check across consumer repos determines whether anything depends on `EXIT_DECLINED=2`; the finding is recorded in the note and, if positive, is called out prominently (release notes / CHANGELOG highlight), but does **not** trigger a compat export. |
+| AC-d4 | No compat shim (e.g. a `LEGACY_EXIT_DECLINED` alias) is provided under any grep outcome. The breaking change ships as a documented breaking change, not a bridged one. |
 | AC-d5 | The kit README's "pure import-path change" claim is corrected to carve out the exit-code semantics. |
 
 ## Implementation notes
 
-Primarily a documentation + release-notes deliverable, plus an optional compat export. The grep (AC-d3) is the gating input for AC-d4: if nothing in the suite reads `EXIT_DECLINED` as `2` for control flow, skip the shim and just document. Keep any compat export deprecated-from-birth so it does not become load-bearing.
+A documentation + release-notes deliverable only — no code-level compat export. The grep (AC-d3) still runs: it sizes the blast radius and determines how loudly the migration note must be surfaced (e.g. a top-of-CHANGELOG breaking-change callout vs. a routine mention), but its outcome no longer gates a shim.
 
 ## Resolved decisions
 
-- **Shim policy → grep first, then decide** (2026-07-12). Run the AC-d3 grep across consumer repos + downstream scripts/CI. Ship the deprecated `LEGACY_EXIT_DECLINED=2` shim (AC-d4) **only if** a real dependency on exit `2`-for-declined is found; otherwise `002d` is documentation + release notes + updating Doctor's tests. The grep is the gate.
+- **Shim policy → no shim, ever** (2026-07-12). Regardless of what the AC-d3 grep finds, the kit does not ship a bridging/deprecated export for the old `2`-on-decline behavior. If the grep finds a real dependency, that finding is surfaced prominently in the migration note and release notes so affected consumers see it before upgrading — but the fix on their side is to update their check, not to lean on a compatibility shim.
+- **Shim removal timing → moot.** Since no shim ships, there is no removal-target question to resolve.
 
 ## Open questions
 
-- [ ] (Pending the grep) — if a dependency is found, what is the shim's removal target (which major)?
+- None.
 
 ## Related
 

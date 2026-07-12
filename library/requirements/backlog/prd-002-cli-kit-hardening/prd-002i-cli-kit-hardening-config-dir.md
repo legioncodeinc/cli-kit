@@ -46,9 +46,9 @@ This is the most impactful item in PRD-002: it is user-facing, it eliminates an 
 - As a sister-CLI author, I ask the kit for my directory (`resolveConfigDir("honeycomb")`) and get a correct, home-anchored path on Windows, macOS, and Linux without writing platform logic.
 - As a security reviewer, I can assert that suite files can never be written to a shared system location.
 
-## Proposed on-disk layout
+## On-disk layout (finalized)
 
-A single root with per-concern namespaces. Exact subpaths to be finalized in review, but the shape:
+A single root with per-concern namespaces, matching today's legacy directory names exactly — minimal renaming, and each name already means something to anyone familiar with the suite:
 
 ```
 ~/.apiary/                     # THE root — the only top-level dir the suite creates
@@ -82,10 +82,11 @@ A single root with per-concern namespaces. Exact subpaths to be finalized in rev
 | AC-i6 | The resolver is the single source of home-path truth: sisters delete their own home-resolution code and call the kit (tracked as a per-sister adoption checklist). |
 | AC-i7 | Zero runtime deps (`node:os`, `node:path`, `node:fs` only). |
 | AC-i8 | An `APIARY_HOME` env var, when set, relocates the root; when it resolves to a system/global directory or a filesystem root it is **rejected** with the same typed error as AC-i2 (the override cannot escape the home-anchored guarantee). Covered by test. |
+| AC-i9 | The legacy-directory move only runs during a one-shot invocation (gated by `isOneShot()` from `002c`); a long-running daemon/watchdog invocation never triggers a move, so a migration is never attempted while that same process's own directory might be in active use. |
 
 ## Migration plan
 
-1. **Detect** legacy top-level dirs (`~/.daemon`, `~/.deeplake`, `~/.honeycomb`, plus any flat `~/.apiary` files) at first run after adoption.
+1. **Detect** legacy top-level dirs (`~/.daemon`, `~/.deeplake`, `~/.honeycomb`, plus any flat `~/.apiary` files) at first run after adoption. Detection (and the move itself) only runs when `isOneShot()` (`002c`) classifies the current invocation as one-shot — a long-running daemon/watchdog invocation never triggers it (AC-i9).
 2. **Consolidate** each into its namespace under `~/.apiary/<service>/`.
 3. **Strategy (resolved: move + symlink fallback):** move legacy dirs into `~/.apiary/<service>/` on next start. When a move is blocked (e.g. a daemon holds open handles), leave a legacy → new **symlink** so the running process keeps working, log a deprecation warning, and complete the move on a later clean start.
 4. **Idempotent & re-runnable**: a second run is a no-op; a partially-migrated state completes cleanly.
@@ -95,15 +96,17 @@ A single root with per-concern namespaces. Exact subpaths to be finalized in rev
 
 - **Migration strategy → move + symlink fallback** (2026-07-12). Move on next start; symlink legacy → new when a move is blocked by open handles, with a logged deprecation warning; complete on a later clean start. See migration plan step 3 / AC-i5.
 - **`APIARY_HOME` override → in scope, still home-anchored** (2026-07-12). Supported, but subject to the same system-directory refusal as AC-i2. See AC-i8.
+- **Migration trigger → one-shot invocations only** (2026-07-12). The move (and the symlink fallback) only runs when `isOneShot()` (`002c`) classifies the current invocation as one-shot; a daemon/watchdog invocation never triggers it. This is what resolves the "does a service need to stop first" concern — the migration simply never runs from a long-running process's own invocation. See AC-i9.
+- **Subpath names → keep today's names as-is** (2026-07-12). `daemon/`, `deeplake/`, `honeycomb/` under `~/.apiary/`, unchanged from their legacy top-level names — minimal renaming, simplest migration mapping. See the finalized on-disk layout above.
 
 ## Open questions
 
-- [ ] Do any services need to run *before* the daemon can be safely stopped, complicating a move while handles are open? Determines exactly which invocations trigger the move vs. defer-to-clean-start.
-- [ ] Final subpath names (`daemon/` vs `runtime/daemon/`, `deeplake/` vs `data/deeplake/`) — settle the namespace map with each service owner.
+- None.
 
 ## Related
 
 - [`ADR-001: single home-anchored ~/.apiary root`](../../../knowledge/private/architecture/ADR-001-apiary-single-home-root.md) — the architecture decision this sub-PRD implements.
 - [`prd-002-cli-kit-hardening`](./prd-002-cli-kit-hardening-index.md) — parent (AC-4/5/6 are this sub-PRD's headline outcomes).
+- [`prd-002c-…-one-shot-guard`](./prd-002c-cli-kit-hardening-one-shot-guard.md) — **dependency**: the migration trigger (AC-i9) is gated by `isOneShot()`, so `002c` should land before or alongside `002i`.
 - Duplication source: home-path resolution across `honeycomb/src/cli/*` (`os.homedir()`, `.deeplake`, XDG lookups).
 - Security relevance: the "never system directories" rule is a trust-boundary property — flag for `security-worker-bee` review at implementation time.

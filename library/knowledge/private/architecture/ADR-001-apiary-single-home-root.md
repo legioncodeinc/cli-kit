@@ -60,8 +60,10 @@ The decision is scoped to *location*: the kit owns where files go, not their con
 
 ### Neutral / follow-ups
 
-- The exact subpath namespace map (`daemon/` vs `runtime/daemon/`, `deeplake/` vs `data/deeplake/`) is deferred to implementation with each service owner (open in PRD-002i).
-- Whether certain services must stop before a daemon can be safely migrated is an open implementation question (PRD-002i).
+- **Resolved (2026-07-12):** the subpath namespace map keeps today's legacy names as-is (`daemon/`, `deeplake/`, `honeycomb/` under `~/.apiary/`) — minimal renaming, simplest migration mapping.
+- **Resolved (2026-07-12):** the "must a service stop first" concern is answered structurally, not case-by-case — the migration is gated by `isOneShot()` (PRD-002c) and never runs from a daemon/watchdog invocation, so it is never attempted while that same process's own directory might be in use.
+
+Both are detailed in [`prd-002i`](../../../requirements/backlog/prd-002-cli-kit-hardening/prd-002i-cli-kit-hardening-config-dir.md)'s Resolved decisions.
 
 ## Alternatives considered
 

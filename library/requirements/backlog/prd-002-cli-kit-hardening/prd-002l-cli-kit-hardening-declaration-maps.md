@@ -37,9 +37,13 @@ Consumers using "go to definition" on a kit symbol land in the emitted `.d.ts`, 
 
 Set `declarationMap: true` in `tsconfig.json`; ensure `declaration` is on (it is, since `types` is published). Add `src` and the map files to the `files` array in `package.json` (currently `["dist", "README.md", "LICENSE.md"]`). Confirm the `.d.ts.map` files reference `../src/*.ts` correctly.
 
+## Resolved decisions
+
+- **Scope → declaration maps only, no runtime source maps** (2026-07-12). Solves the actual DX problem this sub-PRD targets (go-to-definition into the documented source) and keeps the tarball leaner. Revisit runtime `sourceMap`/`.js.map` output later only if stack-trace fidelity becomes a real, separate ask.
+
 ## Open questions
 
-- [ ] Also ship runtime source maps (`sourceMap: true` + `.js.map`) for stack-trace fidelity, or declaration maps only? Leaning declaration-maps-only for now to keep the tarball lean; revisit if debugging demand appears.
+- None.
 
 ## Related
 

@@ -34,7 +34,7 @@ PRD-001's "Resolved decisions" deferred this deliberately: *"CliContext DI patte
 
 | ID | Criterion |
 |---|---|
-| AC-b1 | `finalizeOneShot(code, deps?)` accepts an **optional** injected-deps object covering: the dispatcher lookup/close, the active-handle enumeration + unref, the `exitCode` setter, and the backstop timer (`setTimeout` + `exit`). |
+| AC-b1 | `finalizeOneShot(code, deps?)` accepts an **optional** injected-deps object covering: the dispatcher lookup/close, the active-handle enumeration + unref, the `exitCode` setter, and the backstop timer (`setTimeout` + `exit`). The `FinalizeDeps` type is **exported publicly** so consumers can type-check their own fakes. |
 | AC-b2 | Called with no `deps`, behavior is identical to today (default deps bind to the real `globalThis`/`process`/`setTimeout`). |
 | AC-b3 | The rewritten `tests/shutdown.test.ts` no longer spies on `process._getActiveHandles` and no longer needs the tinypool-IPC workaround; it injects fakes instead. |
 | AC-b4 | All existing shutdown ACs from PRD-001b (`002`… the undici close, unref sweep, no `process.exit` on the happy path, unref'd backstop) still pass. |
@@ -55,9 +55,13 @@ interface FinalizeDeps {
 
 `finalizeOneShot(code, deps = realDeps())` threads `deps` through `doFinalize`. The default factory reads the undici symbol, `process._getActiveHandles`, sets `process.exitCode`, and uses `setTimeout`. Keep the "never throws" guarantee: each injected call stays wrapped in try/catch exactly as today.
 
+## Resolved decisions
+
+- **`FinalizeDeps` visibility → export as a public type** (2026-07-12). Consumers testing their own one-shot exit path can construct and type-check fakes against it directly, rather than against an unexported shape.
+
 ## Open questions
 
-- [ ] Expose `FinalizeDeps` as a public type, or keep it internal and accept a `Partial<FinalizeDeps>`? (Leaning: export the type — consumers testing their own path will want it.)
+- None.
 
 ## Related
 

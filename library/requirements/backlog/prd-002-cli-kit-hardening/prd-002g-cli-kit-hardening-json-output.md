@@ -32,19 +32,23 @@ Machine-readable output is the most-duplicated pattern across the sisters: many 
 | ID | Criterion |
 |---|---|
 | AC-g1 | `emitJson(value, options?)` writes canonical JSON to stdout with a single trailing newline (normalized like the exit-codes `writeLine` helper). |
-| AC-g2 | A documented mechanism ties JSON mode to color: entering JSON mode calls `disableColor()` (either `emitJson` does it, or a dedicated `setJsonMode()` helper does, decided in review). |
+| AC-g2 | A dedicated `setJsonMode()` helper ties JSON mode to color: calling it invokes `disableColor()`. The CLI calls `setJsonMode()` at bootstrap alongside `setColorEnabled()`; `emitJson()` itself does not touch color state. |
 | AC-g3 | Output is deterministic and pipe-safe: no ANSI, no trailing spaces, stable key order for a given input. |
 | AC-g4 | Serialization failures (circular refs, BigInt) are handled without throwing out of the helper — they surface as a usage/runtime error path, not a crash. |
 | AC-g5 | Zero runtime deps; built on `JSON.stringify` + the process streams only. |
 
 ## Implementation notes
 
-Two small pieces: `emitJson(value, { stream? })` for the write, and the color coupling. Prefer a dedicated `setJsonMode()` (or have `emitJson` idempotently call `disableColor()`) so a consumer cannot enter JSON mode with color still on. Reuse the exit-codes newline-normalization discipline. Consider an optional `{ ok, data, error }` envelope type but keep it opt-in — many commands just want the raw object.
+Two small, separate pieces: `emitJson(value, { stream? })` for the write — serializes exactly what the caller passes, no envelope — and `setJsonMode()` for the mode/color coupling, called once at bootstrap next to `setColorEnabled()`. Reuse the exit-codes newline-normalization discipline for the trailing newline.
+
+## Resolved decisions
+
+- **Color coupling → separate `setJsonMode()` at bootstrap** (2026-07-12). The CLI calls `setJsonMode()` alongside `setColorEnabled()` when it resolves its own run mode; `emitJson()` stays a pure serializer with no side effects on color state. Keeps all "how is this CLI configured" decisions in one place at bootstrap.
+- **Output shape → caller-owned, no envelope** (2026-07-12). `emitJson(value)` serializes whatever the caller passes. No standard `{ ok, data, error }` envelope in v1 — matches how the sisters' commands already shape their output, and avoids imposing a bigger, more opinionated contract than any consumer has asked for.
 
 ## Open questions
 
-- [ ] Does `emitJson` disable color itself, or is that a separate `setJsonMode()` the CLI calls at bootstrap (alongside `setColorEnabled`)? Leaning separate `setJsonMode()` so bootstrap owns all mode resolution in one place.
-- [ ] Ship a standard result envelope, or leave shape to the caller? Leaning caller-owned in v1.
+- None.
 
 ## Related
 

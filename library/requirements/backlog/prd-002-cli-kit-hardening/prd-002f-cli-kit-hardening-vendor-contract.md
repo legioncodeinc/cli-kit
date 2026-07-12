@@ -35,17 +35,21 @@ This sub-PRD makes the contract travel with the kit.
 | AC-f1 | `cli-kit/library/notes/cli-contract.md` exists in the kit repo and matches the parent's canonical version at vendor time. |
 | AC-f2 | Every `@see …/cli-contract.md` reference in the kit's `src/` resolves to the vendored file (paths corrected if needed). |
 | AC-f3 | A documented sync step (script or CI check) detects when the vendored copy drifts from the parent canonical copy. |
-| AC-f4 | If the contract is shipped in the npm tarball, the `files` allowlist includes it; if intentionally repo-only, that decision is documented. |
-| AC-f5 | Any other repo-only doc the sources cite (e.g. the parity audit) is handled the same way or the reference is removed. |
+| AC-f4 | The contract is shipped inside the published npm tarball — the `files` allowlist includes `library/notes/cli-contract.md`, so `@see` links resolve for npm-only consumers, not just GitHub browsers. |
+| AC-f5 | The parity audit (the other repo-only doc the sources cite) is vendored the same way, alongside the contract, and included in the `files` allowlist. |
 
 ## Implementation notes
 
-Simplest path: copy `the-apiary/library/notes/cli-contract.md` into `cli-kit/library/notes/` and add a small sync check (a CI step that diffs the two, or a `scripts/sync-contract.mjs`). Decide whether the contract ships in the published tarball (`files` includes `library/notes/cli-contract.md`) or stays repo-only (fine for GitHub browsing, but then `@see` links in *published* `.js`/`.d.ts` still dangle for npm-only consumers — prefer shipping it).
+Copy `the-apiary/library/notes/cli-contract.md` **and** `the-apiary/library/notes/cli-parity-audit.md` into `cli-kit/library/notes/`, add both to the `files` allowlist, and add a small sync check (a CI step that diffs the vendored copies against the parent's canonical versions, or a `scripts/sync-contract.mjs`) so drift is caught.
+
+## Resolved decisions
+
+- **Contract shipping → ship in the npm tarball** (2026-07-12). npm-only consumers (the majority) get resolvable `@see` links in the published `.js`/`.d.ts`; the doc is small, so the tarball-size cost is negligible.
+- **Parity audit → vendor it alongside the contract** (2026-07-12). Same treatment as the contract: copied in, synced, and shipped — every citation in the kit's source comments resolves for an external reader.
 
 ## Open questions
 
-- [ ] Ship the contract in the npm tarball, or repo-only? Leaning ship-it, so npm-only consumers get resolvable links.
-- [ ] Does the parity audit also need vendoring, or should its references be dropped from the kit sources?
+- None.
 
 ## Related
 
