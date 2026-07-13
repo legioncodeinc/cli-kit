@@ -1,0 +1,11 @@
+{
+  "source": "git HEAD before PRD-002e explicit-export refactor",
+  "exports": [
+    "ExitCode", "EXIT_OK", "EXIT_ERROR", "EXIT_USAGE", "parseError", "declined",
+    "setColorEnabled", "disableColor", "isColorEnabled", "bold", "dim", "red",
+    "green", "yellow", "cyan", "amber", "isTelemetryOptedOut", "forceOptOut",
+    "resetOptOutOverride", "FlagSpec", "ParseOptions", "ParsedArgs", "ParseResult",
+    "parseArgs", "finalizeOneShot", "UsageVerb", "UsageGroup", "UsageInput",
+    "formatUsage", "VERSION"
+  ]
+}

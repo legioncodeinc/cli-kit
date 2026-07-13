@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { readFileSync } from "node:fs";
 import {
   ExitCode,
   parseError,
@@ -77,7 +78,10 @@ describe("integration — full barrel import (AC-2)", () => {
 
   it("VERSION is exported from the root", async () => {
     const mod = await import("../src/index.js");
-    expect(mod.VERSION).toBe("0.1.0");
+    const packageJson = JSON.parse(
+      readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+    ) as { version: string };
+    expect(mod.VERSION).toBe(packageJson.version);
   });
 
   it("the FlagSpec type is available as a type-only import", () => {

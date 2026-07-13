@@ -18,10 +18,49 @@ Zero-dependency CLI mechanism kit for the Apiary CLI suite.
 | **arg-parser** | A single shared argv parser (collapses the duplicated bespoke parsers). |
 | **telemetry** | `isTelemetryOptedOut(toolName)` resolver honoring the three env vars. |
 | **usage** | Grouped usage-table formatter (verb column + summary column). |
+| **json-output** | Canonical JSON output and explicit JSON/color bootstrap coupling. |
+| **confirm** | Safe zero-dependency y/N confirmation gate. |
+| **config-dir** | Home-anchored Apiary state resolution and one-shot legacy migration. |
+| **package-version** | Total nearest-package version lookup for ESM consumers. |
+
+## Consumer usage
+
+```ts
+import {
+  confirm,
+  declined,
+  emitJson,
+  migrateLegacyConfig,
+  readPackageVersion,
+  resolveConfigDir,
+  setColorEnabled,
+  setJsonMode,
+} from "@legioncodeinc/cli-kit";
+
+const json = process.argv.includes("--json");
+setColorEnabled();
+if (json) setJsonMode();
+
+// Run only from one-shot bootstrap; `run` is excluded by isOneShot internally.
+migrateLegacyConfig({ argv: process.argv.slice(2) });
+const stateDir = resolveConfigDir("honeycomb");
+const version = readPackageVersion(import.meta.url) ?? "unknown";
+
+if (!(await confirm("Continue?", { assumeYes: process.argv.includes("--yes") }))) {
+  process.exitCode = declined("Aborted."); // intentional decline exits 0
+} else if (json) {
+  if (!emitJson({ version, stateDir })) process.exitCode = 1;
+}
+```
+
+`APIARY_HOME` may relocate state only to an absolute path beneath the invoking user's home. Filesystem roots and known system/global directories are rejected with `ConfigDirError`.
+
+The vendored contract documents are checked against the parent checkout with `node scripts/sync-vendored-docs.mjs`; use `--write` to refresh them.
 
 ## References
 
 - [CLI Contract](./library/notes/cli-contract.md) — the normative specification this kit implements.
+- [CLI parity audit](./library/notes/cli-parity-audit.md) — the source-grounded adoption audit shipped with the kit.
 - [PRD-001](./library/requirements/backlog/prd-001-cli-kit/prd-001-cli-kit-index.md) — the PRD scoping the first shipping version.
 
 ## License

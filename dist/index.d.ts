@@ -18,15 +18,21 @@
  * @see {@link ../library/notes/cli-contract.md} for the normative contract.
  * @see {@link ../library/requirements/backlog/prd-001-cli-kit/prd-001-cli-kit-index.md} for scope.
  */
-export * from "./exit-codes.js";
-export * from "./color.js";
-export * from "./telemetry.js";
-export * from "./arg-parser.js";
-export * from "./shutdown.js";
-export * from "./usage.js";
-/**
- * Semantic version of the kit. Single-sourced from package.json at release time
- * (the publish flow rewrites this via npm-version or a release script); kept as
- * a literal here so the value is available at runtime without a JSON parse.
- */
-export declare const VERSION = "0.1.0";
+export { declined, EXIT_ERROR, EXIT_OK, EXIT_USAGE, ExitCode, parseError } from "./exit-codes.js";
+export { amber, bold, cyan, dim, disableColor, green, isColorEnabled, red, setColorEnabled, yellow } from "./color.js";
+export { forceOptOut, isTelemetryOptedOut, resetOptOutOverride } from "./telemetry.js";
+export { parseArgs } from "./arg-parser.js";
+export type { FlagSpec, ParsedArgs, ParseOptions, ParseResult } from "./arg-parser.js";
+export { finalizeOneShot, isOneShot } from "./shutdown.js";
+export type { FinalizeDeps, OneShotOptions } from "./shutdown.js";
+export { formatUsage } from "./usage.js";
+export type { UsageGroup, UsageInput, UsageVerb } from "./usage.js";
+export { VERSION } from "./generated/version.js";
+export { emitJson, setJsonMode } from "./json-output.js";
+export type { JsonOutputOptions } from "./json-output.js";
+export { confirm } from "./confirm.js";
+export type { ConfirmOptions } from "./confirm.js";
+export { apiaryHome, ConfigDirError, migrateLegacyConfig, resolveConfigDir } from "./config-dir.js";
+export type { ConfigDirOptions, ConfigMigrationResult, MigrateConfigOptions, MigrationFileSystem, } from "./config-dir.js";
+export { readPackageVersion } from "./package-version.js";
+//# sourceMappingURL=index.d.ts.map

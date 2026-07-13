@@ -83,3 +83,4 @@ export type ParseResult = {
  *   malformed input.
  */
 export declare function parseArgs(argv: string[], options?: ParseOptions): ParseResult;
+//# sourceMappingURL=arg-parser.d.ts.map

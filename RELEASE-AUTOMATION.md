@@ -51,6 +51,21 @@ Before the first real release, configure these in the GitHub repo settings:
 2. **Configure trusted publisher** — on npmjs.com, under the package settings, add the trusted publisher: org `legioncodeinc`, repo `cli-kit`, workflow filename `release.yaml`.
 3. After that, every CI publish from a `vX.Y.Z` tag is tokenless via OIDC.
 
+## Verifying provenance and the SBOM
+
+Releases are published by `.github/workflows/release.yaml` with npm trusted
+publishing and `--provenance`; the workflow has the required `id-token: write`
+permission. npm's package page displays the provenance badge and links the
+attestation to this repository and workflow. A consumer can also install the
+package into a clean project and run `npm audit signatures` to verify registry
+signatures and provenance attestations supported by npm.
+
+The same CI job generates a CycloneDX 1.6 JSON SBOM named
+`cli-kit-vX.Y.Z.cdx.json` and attaches it to the matching GitHub Release. The
+SBOM is intentionally a release asset rather than part of the npm tarball.
+Development tools are omitted, so its component and dependency graph directly
+reflects the package's zero-runtime-dependency contract.
+
 ## The `release-gate` required check
 
 Add `release-gate` as a **required status check** on the `main` branch protection rule (Settings → Branches → main → Require status checks). This prevents merging a PR until the release gate is green.

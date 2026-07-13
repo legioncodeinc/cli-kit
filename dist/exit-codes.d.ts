@@ -63,3 +63,4 @@ export declare function parseError(message: string, usageText?: string): ExitCod
  * @returns `ExitCode.Ok` (`0`), for the caller to assign to `process.exitCode`.
  */
 export declare function declined(message: string): ExitCode;
+//# sourceMappingURL=exit-codes.d.ts.map

@@ -54,3 +54,4 @@ export declare function forceOptOut(): void;
  * `isTelemetryOptedOut` reverts to reading env only.
  */
 export declare function resetOptOutOverride(): void;
+//# sourceMappingURL=telemetry.d.ts.map

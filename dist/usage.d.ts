@@ -73,3 +73,4 @@ export interface UsageInput {
  * @returns The rendered usage table as a plain string (no trailing newline).
  */
 export declare function formatUsage(input: UsageInput): string;
+//# sourceMappingURL=usage.d.ts.map

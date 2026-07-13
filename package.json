@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "description": "Zero-dependency CLI mechanism kit for the Apiary CLI suite",
   "type": "module",
+  "sideEffects": false,
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -25,21 +26,34 @@
   },
   "files": [
     "dist",
+    "src",
+    "library/notes/cli-contract.md",
+    "library/notes/cli-parity-audit.md",
     "README.md",
     "LICENSE.md"
   ],
   "scripts": {
+    "version:generate": "node scripts/generate-version.mjs",
+    "prebuild": "npm run version:generate",
     "build": "tsc",
+    "pretypecheck": "npm run version:generate",
     "typecheck": "tsc --noEmit",
+    "pretest": "npm run version:generate",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
+    "docs:check": "node scripts/sync-vendored-docs.mjs",
+    "docs:sync": "node scripts/sync-vendored-docs.mjs --write",
+    "qa:packaging": "node scripts/verify-packaging-evidence.mjs",
     "prepack": "npm run build"
   },
-  "dependencies": {},
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "@vitest/coverage-v8": "^2.1.0",
+    "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.6.0",
-    "vitest": "^2.1.0"
+    "vitest": "^4.1.10"
   }
 }

@@ -56,3 +56,4 @@ export declare const yellow: (s: string) => string;
 export declare const cyan: (s: string) => string;
 /** Honeycomb amber — the brand accent (256-color foreground `38;5;214`). Identity when color is disabled. */
 export declare const amber: (s: string) => string;
+//# sourceMappingURL=color.d.ts.map

@@ -14,6 +14,9 @@ human_description: |
 
 # Notes
 
+- `cli-contract.md` and `cli-parity-audit.md` are vendored from the parent Apiary repository. Run `node scripts/sync-vendored-docs.mjs` to check drift or add `--write` to refresh them when working in the parent checkout.
+- `cli-kit-adoption-checklist.md` tracks the sister-repository work required to make the config resolver the suite-wide source of truth.
+
 Human-only scratch space. Agents never read or write here.
 
 Put rough notes, links, and half-formed ideas here. Nothing here is authoritative.

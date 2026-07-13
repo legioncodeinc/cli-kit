@@ -1,138 +1,95 @@
 /**
- * @legioncodeinc/cli-kit/shutdown — Windows-safe one-shot process teardown.
+ * Windows-safe teardown for one-shot commands.
  *
- * A `finalizeOneShot(code)` helper a one-shot CLI command awaits at the end of
- * `main()` so it exits cleanly after doing network work through the Node global
- * `fetch` (undici) and `node:child_process`.
- *
- * ── The bug this fixes (Windows `UV_HANDLE_CLOSING`) ───────────────────────────
- * Calling `process.exit(code)` on Windows trips a libuv assertion when it races
- * the keep-alive socket teardown and any detached daemon-spawn handle:
- *
- *     Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c
- *
- * The output is already correct and non-mutating — this is purely a
- * dangling-async-handle problem at process exit. Two contributors:
- *   1. undici's global dispatcher keeps a keep-alive connection pool + an
- *      internal async/timer handle alive AFTER a `fetch` resolves.
- *   2. A bare `process.exit()` synchronously tears libuv down. When it runs in
- *      the same tick a handle is mid-close, libuv asserts — so `process.exit()`
- *      itself is the trigger.
- *
- * ── The fix (root cause + graceful drain + bounded backstop) ─────────────────
- * {@link finalizeOneShot}:
- *   1. ROOT CAUSE: close undici's global dispatcher so the keep-alive sockets +
- *      pool timer are torn down.
- *   2. Release the loop: `unref()` every remaining active handle so nothing (a
- *      lingering fetch socket, an inherited stdin pipe) keeps the process alive.
- *   3. GRACEFUL EXIT: set `process.exitCode` and RETURN, letting Node exit
- *      naturally once the loop drains. NO `process.exit()` on the happy path —
- *      that synchronous teardown is what trips the assertion.
- *   4. BOUNDED BACKSTOP: arm a single `unref`'d 2000 ms timer that force-calls
- *      `process.exit(code)` ONLY if the loop refuses to drain within the bound.
- *      The timer is `unref`'d so it never itself keeps the process alive; on the
- *      happy path the process exits before it fires.
- *
- * Every step is wrapped in try/catch — shutdown MUST NOT fail. A best-effort
- * teardown must never turn a correct, already-printed result into a crash.
- *
- * ── Scope: ONE-SHOT ONLY ──────────────────────────────────────────────────────
- * MUST NOT be called from long-running commands (`daemon`/`run`/`start`
- * watchdogs) — those own their lifecycle and call `process.exit()` directly.
- * The long-running exemption is convention (doc-comment only), not a runtime
- * guard; each consumer's watchdog entries are verified by grep at adoption time.
- *
- * Built-ins only (zero runtime deps): no undici import, just the global
- * dispatcher symbol + the process surface.
- *
- * @see {@link ../library/requirements/backlog/prd-001-cli-kit/prd-001b-cli-kit-shutdown.md}
- * @see {@link ../library/notes/cli-contract.md} §10 (one-shot vs long-running)
+ * Gate calls with {@link isOneShot}; long-running commands own their lifecycle
+ * and must not use this teardown path.
  */
-/** The well-known global-symbol key undici registers its global dispatcher under. */
 const UNDICI_GLOBAL_DISPATCHER = Symbol.for("undici.globalDispatcher.1");
-/** The ms the unref'd backstop waits before forcing the exit. Matches Doctor's proven bound. */
 const BACKSTOP_MS = 2_000;
-/**
- * Tear down the process safely and exit with `code`.
- *
- * For one-shot commands that have used undici/fetch: closes the global
- * dispatcher, unrefs active handles, sets `process.exitCode`, and lets the
- * event loop drain. An unref'd 2000 ms backstop force-exits if draining stalls.
- *
- * The teardown sequence, in order, every step wrapped in try/catch:
- *   1. Close undici's global dispatcher (releases keep-alive sockets cleanly).
- *   2. Unref every active handle so the loop can drain.
- *   3. Set `process.exitCode = code` (the loop then drains naturally).
- *   4. Arm an unref'd 2000 ms backstop that force-exits only if draining stalls.
- *
- * The happy path does NOT call `process.exit()` — that synchronous teardown is
- * the Windows assertion trigger. Only the backstop timer calls it, and only if
- * a handle refused to unref.
- *
- * MUST NOT be called from long-running commands (daemon/run/start) — those own
- * their lifecycle and call `process.exit()` directly. This exemption is
- * convention (doc-comment only), not a runtime guard.
- *
- * @param code - The exit code the one-shot resolved with (0 success, 1 error, 2 usage).
- * @returns A Promise the caller `await`s at the end of `main()`. Resolves once
- *   the exit code is set and the backstop is armed; the process then drains.
- */
-export function finalizeOneShot(code) {
-    return doFinalize(code);
+function realDeps() {
+    return {
+        getDispatcher: () => globalThis[UNDICI_GLOBAL_DISPATCHER],
+        getActiveHandles: () => {
+            const getHandles = process
+                ._getActiveHandles;
+            return typeof getHandles === "function" ? getHandles.call(process) : [];
+        },
+        setExitCode: (code) => {
+            process.exitCode = code;
+        },
+        scheduleBackstop: (callback, ms) => setTimeout(callback, ms),
+        exit: (code) => process.exit(code),
+    };
 }
 /**
- * The async core, separated so {@link finalizeOneShot} keeps the documented
- * `(code) => Promise<void>` signature while the implementation can `await`.
+ * Return whether an invocation is safe to finalize as a one-shot command.
+ * Bare, help, unknown, and malformed invocations are treated as one-shot.
  */
-async function doFinalize(code) {
-    // Step 1 (root cause): close undici's global dispatcher. When no `fetch` ran,
-    // the symbol is absent and there is nothing to close — a no-op-safe call.
-    // NEVER throws: a teardown failure must not crash a one-shot that already
-    // printed its (correct, non-mutating) output.
+export function isOneShot(argv, options) {
+    const command = Array.isArray(argv) ? argv[0] : undefined;
+    if (typeof command !== "string")
+        return true;
+    const configured = options?.watchdogCommands;
+    const watchdogCommands = Array.isArray(configured)
+        ? configured.filter((value) => typeof value === "string")
+        : ["run"];
+    return !watchdogCommands.includes(command);
+}
+/**
+ * Close network state, release active handles, set the graceful exit code, and
+ * arm an unref'd 2000 ms force-exit backstop. Use only when
+ * `isOneShot(argv, options)` returns true.
+ *
+ * Every effect is best-effort: shutdown never turns an already-produced result
+ * into a new failure.
+ */
+export async function finalizeOneShot(code, deps = realDeps()) {
     try {
-        const dispatcher = globalThis[UNDICI_GLOBAL_DISPATCHER];
-        if (dispatcher !== undefined && dispatcher !== null && typeof dispatcher.close === "function") {
+        const dispatcher = deps.getDispatcher();
+        if (typeof dispatcher?.close === "function")
             await dispatcher.close();
-        }
     }
     catch {
-        // Swallowed deliberately: best-effort teardown, documented at the call site.
+        // Best-effort dispatcher cleanup must not replace the command result.
     }
-    // Step 2: release every remaining handle so nothing keeps the loop alive (a
-    // lingering fetch socket, an inherited stdin pipe). We only `unref` (mark
-    // "do not keep the loop alive") — deliberately NOT `destroy()`, which creates
-    // a NEW closing handle and re-introduces the assertion. The underscore API is
-    // undocumented but stable across Node 18–22; accessed defensively so its
-    // absence or any odd handle is a no-op, never a throw.
     try {
-        const getHandles = process._getActiveHandles;
-        if (typeof getHandles === "function") {
-            const handles = getHandles.call(process);
-            for (const handle of handles) {
-                try {
-                    const h = handle;
-                    if (typeof h.unref === "function") {
-                        h.unref();
-                    }
-                }
-                catch {
-                    // An odd handle that resists unref is simply skipped; never throw.
-                }
+        for (const handle of deps.getActiveHandles()) {
+            try {
+                const candidate = handle;
+                if (typeof candidate.unref === "function")
+                    candidate.unref();
+            }
+            catch {
+                // One malformed handle must not prevent the remaining sweep.
             }
         }
     }
     catch {
-        // Defensive: the unref sweep is best-effort and must never throw out of shutdown.
+        // Active-handle enumeration is an undocumented, best-effort Node seam.
     }
-    // Step 3 (graceful): set the code and let Node exit naturally. NO
-    // process.exit() here — that synchronous teardown is the assertion trigger.
-    process.exitCode = code;
-    // Step 4 (bounded backstop): if the loop somehow refuses to drain (a handle
-    // refused to unref, a detached spawn lingers), force the exit with the
-    // intended code. The timer is unref'd so on the happy path the process exits
-    // first and this never fires.
-    const backstop = setTimeout(() => process.exit(code), BACKSTOP_MS);
-    // Timer handles expose unref(); guard defensively in case the runtime ever
-    // returns an opaque handle without it (never observed on Node 18–22).
-    backstop.unref?.();
+    try {
+        deps.setExitCode(code);
+    }
+    catch {
+        // Injected/process exit-code setters are best-effort during teardown.
+    }
+    try {
+        const backstop = deps.scheduleBackstop(() => {
+            try {
+                deps.exit(code);
+            }
+            catch {
+                // A test double or host exit implementation may throw; never leak it.
+            }
+        }, BACKSTOP_MS);
+        try {
+            backstop.unref?.();
+        }
+        catch {
+            // An unusual timer handle may reject unref; shutdown remains best-effort.
+        }
+    }
+    catch {
+        // Failure to schedule the last-resort backstop must not reject shutdown.
+    }
 }
