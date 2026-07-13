@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## v0.3.0 — 2026-07-13
+
+Adds the shared Apiary CLI interface foundation for Doctor, Hive, Honeycomb,
+and Nectar: typed operational command manifests, canonical service command
+aliases, lifecycle adapter contracts, product branding/help rendering, stable
+human and JSON result envelopes, status and telemetry summaries, product-bound
+log tailing with secret redaction, and a cross-product reference conformance
+harness. Product repositories adopt these contracts in their own releases.
+
 ### Breaking behavior: declined actions exit 0
 
 Doctor adopters must account for `declined()` returning `0`, replacing Doctor's

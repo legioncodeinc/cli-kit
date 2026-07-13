@@ -22,6 +22,8 @@ Zero-dependency CLI mechanism kit for the Apiary CLI suite.
 | **confirm** | Safe zero-dependency y/N confirmation gate. |
 | **config-dir** | Home-anchored Apiary state resolution and one-shot legacy migration. |
 | **package-version** | Total nearest-package version lookup for ESM consumers. |
+| **branding** | Pure product banner, grouped help, exact credit, and human/JSON version rendering. |
+| **reference-cli** | Side-effect-free golden harness for consumer conformance preparation. |
 
 ## Consumer usage
 
@@ -56,6 +58,8 @@ if (!(await confirm("Continue?", { assumeYes: process.argv.includes("--yes") }))
 `APIARY_HOME` may relocate state only to an absolute path beneath the invoking user's home. Filesystem roots and known system/global directories are rejected with `ConfigDirError`.
 
 The vendored contract documents are checked against the parent checkout with `node scripts/sync-vendored-docs.mjs`; use `--write` to refresh them.
+
+PRD-003 consumers should follow the [adoption checklist](./library/notes/prd-003-adoption-checklist.md) and the [suite command matrix](./library/notes/prd-003-command-matrix.md). Reference art is test-fixture data; final art remains product-owned and must be reviewed in each product repository.
 
 ## References
 

@@ -1,6 +1,6 @@
 {
   "name": "@legioncodeinc/cli-kit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Zero-dependency CLI mechanism kit for the Apiary CLI suite",
   "type": "module",
   "sideEffects": false,
@@ -29,6 +29,8 @@
     "src",
     "library/notes/cli-contract.md",
     "library/notes/cli-parity-audit.md",
+    "library/notes/prd-003-adoption-checklist.md",
+    "library/notes/prd-003-command-matrix.md",
     "README.md",
     "LICENSE.md"
   ],

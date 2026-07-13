@@ -1,0 +1,430 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`golden reference CLI > covers narrow, version, unknown, and human success/failure for doctor > narrow 1`] = `
+{
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "  .---.
+  | + |
+  '---'
+DOCTOR
+Apiary service health and
+diagnostics
+v1.2.3
+Legion Code Inc. x Activeloop
+
+Usage: doctor <command>
+[options]
+
+Service lifecycle
+  start    Start the installed
+           service
+  stop     Stop the installed
+           service
+  restart  Restart and verify
+           the service
+  status   Show service status
+  logs     Tail product logs
+
+Installation
+  install            Configure
+                     and onboard
+                     the product
+  uninstall          Remove the
+                     product
+  service-install    Install or
+                     reconcile
+                     the OS
+                     service
+  service-uninstall  Remove only
+                     the OS
+                     service
+  update             Update
+                     through the
+                     approved
+                     release
+                     channel
+
+Diagnostics
+  telemetry  Inspect or
+             configure telemetry
+
+Global flags
+  --help, -h  Show help
+  --version   Show version
+  --json      Emit
+              machine-readable
+              output
+  --no-color  Disable color
+",
+}
+`;
+
+exports[`golden reference CLI > covers narrow, version, unknown, and human success/failure for hive > narrow 1`] = `
+{
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "  /\\_/\\
+ /_/ \\_\\
+ \\ \\_/ /
+  \\___/
+HIVE
+Apiary colony service
+coordinator
+v1.2.3
+Legion Code Inc. x Activeloop
+
+Usage: hive <command> [options]
+
+Service lifecycle
+  start    Start the installed
+           service
+  stop     Stop the installed
+           service
+  restart  Restart and verify
+           the service
+  status   Show service status
+  logs     Tail product logs
+
+Installation
+  install            Configure
+                     and onboard
+                     the product
+  uninstall          Remove the
+                     product
+  service-install    Install or
+                     reconcile
+                     the OS
+                     service
+  service-uninstall  Remove only
+                     the OS
+                     service
+  update             Update
+                     through the
+                     approved
+                     release
+                     channel
+
+Fleet
+  register  Upsert this product
+            in Doctor's registry
+
+Diagnostics
+  telemetry  Inspect or
+             configure telemetry
+
+Global flags
+  --help, -h  Show help
+  --version   Show version
+  --json      Emit
+              machine-readable
+              output
+  --no-color  Disable color
+",
+}
+`;
+
+exports[`golden reference CLI > covers narrow, version, unknown, and human success/failure for honeycomb > narrow 1`] = `
+{
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "   __    __
+  /  \\__/  \\
+  \\__/  \\__/
+  /  \\__/  \\
+  \\__/  \\__/
+HONEYCOMB
+Apiary shared memory service
+v1.2.3
+Legion Code Inc. x Activeloop
+
+Usage: honeycomb <command>
+[options]
+
+Service lifecycle
+  start    Start the installed
+           service
+  stop     Stop the installed
+           service
+  restart  Restart and verify
+           the service
+  status   Show service status
+  logs     Tail product logs
+
+Installation
+  install            Configure
+                     and onboard
+                     the product
+  uninstall          Remove the
+                     product
+  service-install    Install or
+                     reconcile
+                     the OS
+                     service
+  service-uninstall  Remove only
+                     the OS
+                     service
+  update             Update
+                     through the
+                     approved
+                     release
+                     channel
+
+Fleet
+  register  Upsert this product
+            in Doctor's registry
+
+Diagnostics
+  telemetry  Inspect or
+             configure telemetry
+
+Global flags
+  --help, -h  Show help
+  --version   Show version
+  --json      Emit
+              machine-readable
+              output
+  --no-color  Disable color
+",
+}
+`;
+
+exports[`golden reference CLI > covers narrow, version, unknown, and human success/failure for nectar > narrow 1`] = `
+{
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "    .
+   / \\
+  /   \\
+  \\   /
+   \\_/
+NECTAR
+Apiary knowledge cultivation
+service
+v1.2.3
+Legion Code Inc. x Activeloop
+
+Usage: nectar <command>
+[options]
+
+Service lifecycle
+  start    Start the installed
+           service
+  stop     Stop the installed
+           service
+  restart  Restart and verify
+           the service
+  status   Show service status
+  logs     Tail product logs
+
+Installation
+  install            Configure
+                     and onboard
+                     the product
+  uninstall          Remove the
+                     product
+  service-install    Install or
+                     reconcile
+                     the OS
+                     service
+  service-uninstall  Remove only
+                     the OS
+                     service
+  update             Update
+                     through the
+                     approved
+                     release
+                     channel
+
+Fleet
+  register  Upsert this product
+            in Doctor's registry
+
+Diagnostics
+  telemetry  Inspect or
+             configure telemetry
+
+Global flags
+  --help, -h  Show help
+  --version   Show version
+  --json      Emit
+              machine-readable
+              output
+  --no-color  Disable color
+",
+}
+`;
+
+exports[`golden reference CLI > makes bare and help byte-identical for doctor 1`] = `
+{
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "  .---.
+  | + |
+  '---'
+DOCTOR
+Apiary service health and diagnostics
+v1.2.3
+Legion Code Inc. x Activeloop
+
+Usage: doctor <command> [options]
+
+Service lifecycle
+  start    Start the installed service
+  stop     Stop the installed service
+  restart  Restart and verify the service
+  status   Show service status
+  logs     Tail product logs
+
+Installation
+  install            Configure and onboard the product
+  uninstall          Remove the product
+  service-install    Install or reconcile the OS service
+  service-uninstall  Remove only the OS service
+  update             Update through the approved release channel
+
+Diagnostics
+  telemetry  Inspect or configure telemetry
+
+Global flags
+  --help, -h  Show help
+  --version   Show version
+  --json      Emit machine-readable output
+  --no-color  Disable color
+",
+}
+`;
+
+exports[`golden reference CLI > makes bare and help byte-identical for hive 1`] = `
+{
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "  /\\_/\\
+ /_/ \\_\\
+ \\ \\_/ /
+  \\___/
+HIVE
+Apiary colony service coordinator
+v1.2.3
+Legion Code Inc. x Activeloop
+
+Usage: hive <command> [options]
+
+Service lifecycle
+  start    Start the installed service
+  stop     Stop the installed service
+  restart  Restart and verify the service
+  status   Show service status
+  logs     Tail product logs
+
+Installation
+  install            Configure and onboard the product
+  uninstall          Remove the product
+  service-install    Install or reconcile the OS service
+  service-uninstall  Remove only the OS service
+  update             Update through the approved release channel
+
+Fleet
+  register  Upsert this product in Doctor's registry
+
+Diagnostics
+  telemetry  Inspect or configure telemetry
+
+Global flags
+  --help, -h  Show help
+  --version   Show version
+  --json      Emit machine-readable output
+  --no-color  Disable color
+",
+}
+`;
+
+exports[`golden reference CLI > makes bare and help byte-identical for honeycomb 1`] = `
+{
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "   __    __
+  /  \\__/  \\
+  \\__/  \\__/
+  /  \\__/  \\
+  \\__/  \\__/
+HONEYCOMB
+Apiary shared memory service
+v1.2.3
+Legion Code Inc. x Activeloop
+
+Usage: honeycomb <command> [options]
+
+Service lifecycle
+  start    Start the installed service
+  stop     Stop the installed service
+  restart  Restart and verify the service
+  status   Show service status
+  logs     Tail product logs
+
+Installation
+  install            Configure and onboard the product
+  uninstall          Remove the product
+  service-install    Install or reconcile the OS service
+  service-uninstall  Remove only the OS service
+  update             Update through the approved release channel
+
+Fleet
+  register  Upsert this product in Doctor's registry
+
+Diagnostics
+  telemetry  Inspect or configure telemetry
+
+Global flags
+  --help, -h  Show help
+  --version   Show version
+  --json      Emit machine-readable output
+  --no-color  Disable color
+",
+}
+`;
+
+exports[`golden reference CLI > makes bare and help byte-identical for nectar 1`] = `
+{
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "    .
+   / \\
+  /   \\
+  \\   /
+   \\_/
+NECTAR
+Apiary knowledge cultivation service
+v1.2.3
+Legion Code Inc. x Activeloop
+
+Usage: nectar <command> [options]
+
+Service lifecycle
+  start    Start the installed service
+  stop     Stop the installed service
+  restart  Restart and verify the service
+  status   Show service status
+  logs     Tail product logs
+
+Installation
+  install            Configure and onboard the product
+  uninstall          Remove the product
+  service-install    Install or reconcile the OS service
+  service-uninstall  Remove only the OS service
+  update             Update through the approved release channel
+
+Fleet
+  register  Upsert this product in Doctor's registry
+
+Diagnostics
+  telemetry  Inspect or configure telemetry
+
+Global flags
+  --help, -h  Show help
+  --version   Show version
+  --json      Emit machine-readable output
+  --no-color  Disable color
+",
+}
+`;

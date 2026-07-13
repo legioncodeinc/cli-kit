@@ -35,4 +35,18 @@ export type { ConfirmOptions } from "./confirm.js";
 export { apiaryHome, ConfigDirError, migrateLegacyConfig, resolveConfigDir } from "./config-dir.js";
 export type { ConfigDirOptions, ConfigMigrationResult, MigrateConfigOptions, MigrationFileSystem, } from "./config-dir.js";
 export { readPackageVersion } from "./package-version.js";
+export { BASELINE_COMMANDS, COMMAND_GROUPS, composeProductManifest, exitCodeFor, resolveCommand, validateManifest } from "./command-contract.js";
+export type { CommandGroup, CommandResolution, CommandResult, CommandSpec, ConformanceIssue, Outcome, Product, ProductManifest } from "./command-contract.js";
+export { registerProduct, restart, serviceInstall, serviceInstallInvocation, serviceUninstall, start, stop, uninstallProduct, updateProduct } from "./lifecycle.js";
+export type { FixedArgvInvocation, LifecycleResult, ProductStateAdapter, RegistryAdapter, ServiceAdapter, ServiceDefinition, ServicePlatform, ServiceState, UpdateAdapter } from "./lifecycle.js";
+export { APIARY_CREDIT, REFERENCE_PRODUCT_BRANDS, renderGroupedHelp, renderProductBanner, renderVersion, renderVersionJson } from "./branding.js";
+export type { BannerOptions, ProductBrand } from "./branding.js";
+export { runReferenceCli } from "./reference-cli.js";
+export type { ReferenceCliOptions, ReferenceCliResult } from "./reference-cli.js";
+export { parseLogTailOptions, parseSince, redactLogSecrets, tailProductLog, validateProductLogSource } from "./log-tail.js";
+export type { LogFileSystem, LogSourceResult, LogTailOptions, LogTailOptionsResult, LogTailRequest, LogTailResult, ProductLogSource } from "./log-tail.js";
+export { formatStatus, statusToJson } from "./status.js";
+export type { HealthState, InstallationState, ProcessState, RegistrationState, ServiceStatus } from "./status.js";
+export { formatTelemetrySummary, telemetrySummaryToJson } from "./telemetry-summary.js";
+export type { TelemetryDestination, TelemetrySummary } from "./telemetry-summary.js";
 //# sourceMappingURL=index.d.ts.map
