@@ -3,9 +3,9 @@
 > **Created:** 2026-07-12
 > **Source:** [`prd-003-apiary-cli-interface-standard`](../requirements/backlog/prd-003-apiary-cli-interface-standard/)
 > **Orchestrator:** the-smoker
-> **Active scope:** cli-kit preparation and local verification only
-> **Excluded scope:** deployment, repository changes, native product CI, and releases for Doctor, Hive, Honeycomb, and Nectar
-> **Status:** PREP COMPLETE — 16/56 acceptance criteria VERIFIED locally; 40 BLOCKED by user scope; 0 DONE/OPEN/IN PROGRESS
+> **Active scope:** cli-kit preparation plus Hive's PRD-003 adoption rollout
+> **Excluded scope:** deployment, repository changes, native product CI, and releases for Doctor, Honeycomb, and Nectar; Hive is the first authorized product deployment wave
+> **Status:** HIVE ADOPTION VERIFIED — 17/56 acceptance criteria VERIFIED; Hive AC-e3 is complete; 39 suite/deployment criteria remain BLOCKED
 
 ## Prior-run history
 
@@ -16,10 +16,11 @@
 
 - `OPEN` means the exact criterion can be implemented and verified inside cli-kit without changing or releasing a product repository.
 - `DONE` means the cli-kit-local preparation is implemented and has concrete local test/build/package evidence; it does not claim product deployment.
+- `IN PROGRESS` means an authorized product rollout is actively gathering the exact implementation and packed-artifact proof; it does not satisfy a suite-wide criterion by itself.
 - `BLOCKED` means the exact wording inherently requires product-repository deployment, a packed product artifact, native product CI, or a published product release excluded by the user.
 - `VERIFIED` is allowed only after durable command, test, artifact, or document evidence is recorded against the exact observable requirement.
 - Every blocked row records `Deferred by user scope` and the precise future proof required.
-- PRD-003 does not move to completed in this run because the user explicitly excluded deployment to the four CLIs.
+- PRD-003 does not move to completed during the Hive-only rollout because Doctor, Honeycomb, Nectar, the four-product suite job, and all required product releases remain outside this wave.
 
 ## Parent acceptance criteria
 
@@ -98,14 +99,52 @@
 |---|---|---|---|---|---|
 | AC-e1 | Honeycomb's packed CLI passes the full shared matrix and retains all pre-adoption product-specific commands. | BLOCKED | Honeycomb maintainer, quality-worker-bee | Deferred by user scope. Future proof: packed Honeycomb conformance run plus pre/post product-command inventory. | Honeycomb adoption/release candidate |
 | AC-e2 | Doctor's packed CLI passes the matrix with only the documented `register` exemption and continues to validate non-Doctor registry entries. | BLOCKED | Doctor maintainer, quality-worker-bee | Deferred by user scope. Future proof: packed Doctor conformance and non-Doctor registry validation integration results. | Doctor adoption/release candidate |
-| AC-e3 | Hive's packed CLI passes the matrix; canonical service verbs are `service-install`/`service-uninstall`, with old spellings tested as deprecated aliases for the migration window. | BLOCKED | Hive maintainer, quality-worker-bee | Deferred by user scope. Future proof: packed Hive conformance plus canonical/help/deprecated-alias tests. | Hive adoption/release candidate |
+| AC-e3 | Hive's packed CLI passes the matrix; canonical service verbs are `service-install`/`service-uninstall`, with old spellings tested as deprecated aliases for the migration window. | VERIFIED | Hive maintainer, quality-worker-bee | VERIFIED: Hive `npm run test:packed-cli` packs, installs, and exercises the tarball successfully; primary help advertises canonical `service-install`/`service-uninstall` and omits old spellings; alias/unit tests retain deprecated `install-service`/`uninstall-service`; `daemon` remains under Product commands. Final QA is a clean PASS with zero Critical/Warning/Suggestion, 54/54 focused tests, and 97 files / 834/834 full tests. Security PASS has no open Critical/High/Medium finding and 68/68 security-focused tests pass; typecheck, build, packed conformance, zero-vulnerability audit, and diff check also pass. Device dogfood on globally installed `@legioncodeinc/hive` 0.11.1 proves the scheduled-task `service-daemon` action, healthy 0.11.1 endpoint, identity-revalidated restart PID 110864 -> 116892, and working Hive service-log tail after stale PID 104964 was terminated. Evidence: `hive/scripts/verify-packed-cli.mjs`, Hive QA/security reports, and device dogfood record. | Hive packed artifact; final QA/security close-out; live device dogfood |
 | AC-e4 | Nectar's packed CLI passes the matrix and retains its brood, search, projects, brooding, prune, review, and projection surfaces. | BLOCKED | Nectar maintainer, quality-worker-bee | Deferred by user scope. Future proof: packed Nectar conformance plus retained-surface inventory/tests. | Nectar adoption/release candidate |
-| AC-e5 | Every repository has a changelog/migration note listing added commands, renamed aliases, changed semantics, and automation-impacting exit/output changes. | BLOCKED | product maintainers, library-worker-bee | Deferred by user scope. Future proof: reviewed changelog/migration note in each of the four product repositories. | completed product migrations |
-| AC-e6 | Native CI verifies service adapter behavior on Windows, macOS, and Linux for every product. | BLOCKED | product maintainers, devops-worker-bee | Deferred by user scope. Future proof: successful native Windows/macOS/Linux CI runs for every adopted product. | product CI/adapters |
-| AC-e7 | A suite-level conformance job installs the packed versions of all four products and verifies command presence, help structure, banners, credit, versions, JSON cleanliness, and log-source isolation. | BLOCKED | devops-worker-bee, quality-worker-bee | Deferred by user scope. Future proof: successful suite CI URL/artifacts for the four packed adopted products and every named check. | AC-e1–e6; packed artifacts |
-| AC-e8 | No product is marked adopted while any required command is a silent stub, exits success without doing the documented work, or delegates to the wrong product's service/state/log source. | BLOCKED | quality-worker-bee, product maintainers | Deferred by user scope. Future proof: per-product non-stub behavioral audit and source-isolation tests before adoption marking. | product implementations |
+| AC-e5 | Every repository has a changelog/migration note listing added commands, renamed aliases, changed semantics, and automation-impacting exit/output changes. | BLOCKED | product maintainers, library-worker-bee | Hive portion VERIFIED by final QA against `CHANGELOG.md`, README, active runbook, and `library/knowledge/private/operations/prd-003-cli-migration.md`. Deferred by user scope. Future proof: equivalent reviewed notes in Doctor, Honeycomb, and Nectar. | completed product migrations |
+| AC-e6 | Native CI verifies service adapter behavior on Windows, macOS, and Linux for every product. | BLOCKED | product maintainers, devops-worker-bee | Hive three-OS workflow is configured in `.github/workflows/ci.yaml`, but the final QA explicitly records the dirty branch as unpushed and native CI run evidence as pending. Deferred by user scope. Future proof: successful pushed Ubuntu/macOS/Windows Hive run plus equivalent native runs for Doctor, Honeycomb, and Nectar. | product CI/adapters |
+| AC-e7 | A suite-level conformance job installs the packed versions of all four products and verifies command presence, help structure, banners, credit, versions, JSON cleanliness, and log-source isolation. | BLOCKED | devops-worker-bee, quality-worker-bee | Hive's local installed-tarball conformance is VERIFIED; it is not the required four-package suite job. Deferred by user scope. Future proof: successful suite CI URL/artifacts installing all four adopted packages and checking every named behavior. | AC-e1–e6; packed artifacts |
+| AC-e8 | No product is marked adopted while any required command is a silent stub, exits success without doing the documented work, or delegates to the wrong product's service/state/log source. | BLOCKED | quality-worker-bee, product maintainers | Hive portion VERIFIED by final clean QA (zero Critical/Warning/Suggestion), 54/54 focused tests, 97 files / 834/834 full tests, packed conformance, source-isolation tests, security PASS with 68/68 security-focused tests, and live service/restart/log dogfood. Deferred by user scope. Future proof: equivalent non-stub and wrong-product audits for Doctor, Honeycomb, and Nectar. | product implementations |
 | AC-e9 | Documentation presents one suite-wide command matrix and links to product-specific command details without duplicating the normative semantics. | VERIFIED | library-worker-bee | `library/notes/prd-003-command-matrix.md` presents one suite matrix and points normative meanings to PRD-003; `library/notes/prd-003-adoption-checklist.md` directs products to retain/link specialized details without duplicating semantics; docs/package checks pass. | shared manifest/contract |
-| AC-e10 | All four releases containing the adoption are published before PRD-003 moves to completed. | BLOCKED | product maintainers, devops-worker-bee | Deferred by user scope. Future proof: published release URLs and package versions for Doctor, Hive, Honeycomb, and Nectar containing adoption. | AC-e1–e9; product releases |
+| AC-e10 | All four releases containing the adoption are published before PRD-003 moves to completed. | BLOCKED | product maintainers, devops-worker-bee | Hive implementation is verified but the working revision remains unpushed; the globally installed 0.11.1 device artifact is dogfood evidence, not proof that a published 0.11.1 release contains this adoption. Deferred by user scope. Future proof: published release URLs and package versions for Doctor, Hive, Honeycomb, and Nectar containing adoption. | AC-e1–e9; product releases |
+
+## Hive rollout evidence map
+
+Hive completed AC-e3 and supplies the Hive portion of the suite-wide criteria below. A Hive result is partial evidence only where the exact criterion requires multiple products; those ledger rows remain `BLOCKED` until every named product and suite-level proof exists.
+
+| Criteria receiving Hive evidence | Exact Hive verification required | Effect on criterion |
+|---|---|---|
+| AC-1, AC-a2, AC-a7 | Packed Hive command inventory contains every baseline verb including `register`; help is composed from the shared and Hive product manifests with baseline rows appearing once; every pre-adoption Hive command remains dispatchable under `Product commands`. | Partial suite evidence only. |
+| AC-2, AC-a4 | Handler/integration tests prove Hive uses the binding command semantics, stdout/stderr rules, and exit classes: usage `2`, runtime `1`, success/idempotent `0`. | Partial suite evidence only. |
+| AC-3, AC-d1, AC-d2, AC-d10 | Packed bare and `--help` goldens show reviewed ASCII-only Hive/colony art at 80 columns, `HIVE`, descriptor, package-derived version, usage/groups, and exact `Legion Code Inc. x Activeloop` credit. | Partial suite evidence only. |
+| AC-4, AC-c3, AC-c4 | Adversarial tests prove Hive `logs` is fixed to Hive's validated service identifier and authoritative destination, rejects arbitrary paths/units, and cannot read Doctor/Honeycomb/Nectar sources. | Partial suite evidence only. |
+| AC-5, AC-b2 | Hive `register` idempotently upserts Hive's Doctor registry entry; integration evidence shows Doctor observes the resulting entry. Doctor's own behavior remains separately required. | Partial suite evidence only. |
+| AC-6, AC-a8, AC-e7 | The shared conformance harness runs against the packed Hive artifact and catches a deliberate Hive fixture drift in verb, help, banner, exit, JSON, or log identity. The four-product suite job remains required. | Partial suite evidence only. |
+| AC-7 | Pre/post Hive command inventory and packed dispatch/help tests prove dashboard and all other Hive-owned commands remain available in the separate product group. | Partial suite evidence only. |
+| AC-8, AC-a5, AC-a6 | Packed Hive human goldens match the shared structure; every operational verb's `--json` emits one stable envelope with `product`, `command`, `ok`, and `message`, one newline, and no ANSI/banner/credit/prompt/prose. | Partial suite evidence only. |
+| AC-a3, AC-e3 | Packed parsing/help tests prove canonical `service-install`/`service-uninstall`; old `install-service`/`uninstall-service` aliases dispatch as deprecated and are absent from primary help. | VERIFIED for Hive by installed-tarball conformance plus alias/unit tests; AC-e3 is complete. |
+| AC-a9 | Packed Hive goldens cover bare, help, version, unknown, human success/failure, and JSON success/failure. | Partial suite evidence only. |
+| AC-b1 | Real Hive adapters implement and test `start`, `stop`, `restart`, `install`, `uninstall`, `service-install`, `service-uninstall`, and `update` with the binding semantics. | Partial suite evidence only. |
+| AC-b3, AC-b4 | Repeated-state tests prove Hive `start`, `stop`, both service operations, and `register` return `0`; restart waits for a bounded Hive running/health check and fails on timeout/unhealthy state. | Partial suite evidence only. |
+| AC-b5, AC-b6 | Filesystem/registry tests prove Hive `service-uninstall` preserves state/registration and full confirmed uninstall removes only explicitly selected Hive-owned state, never shared credentials, other registry entries, or another product directory. | Partial suite evidence only. |
+| AC-b7 | Hive updater tests prove installed/target reporting, approved-channel use, state preservation, restart/health verification, and rollback or hard failure after failed health. | Partial suite evidence only. |
+| AC-b8, AC-e6 | Fixed-argv Hive service-adapter tests pass locally and the Ubuntu/macOS/Windows matrix is configured. The final unpushed revision has no native CI run URL yet. | Implementation evidence only; native-run and suite evidence remain pending. |
+| AC-b9 | Installed Hive service definitions on each platform route stdout/stderr to the same authoritative Hive source consumed by `hive logs`. | Partial suite evidence only. |
+| AC-b10, AC-e5 | Hive changelog/migration note lists every added/renamed command, temporary alias, semantic change, and automation-impacting exit/output change, explicitly including both service-verb renames. | Partial suite evidence only. |
+| AC-c1 | Hive status tests/goldens cover the required ordered human fields and equivalent structured JSON for running, stopped, not-installed, and unhealthy states. | Partial suite evidence only. |
+| AC-c2, AC-c5, AC-c6 | Packed Hive logs tests prove 100-line follow defaults, all three options, non-mutating secret redaction, clean Ctrl+C exit `0`, and concise missing/unreadable exit `1`. | Product adoption evidence for already-VERIFIED shared primitives. |
+| AC-c7, AC-c8 | Hive telemetry goldens cover enabled/opted-out settings, destination and delivery health without secrets; injected spies prove status, bounded logs, and telemetry never start/restart Hive. | Product adoption evidence for already-VERIFIED shared primitives. |
+| AC-c9 | Hive human/JSON goldens cover running, stopped, not-installed, unhealthy, missing-log, telemetry-enabled, and telemetry-opted-out states. | Partial suite evidence only. |
+| AC-d4, AC-d5, AC-d6 | Hive help side-effect spies cover filesystem, service manager, network, registry, and daemon seams; NO_COLOR/non-TTY/`--no-color` text equivalence and JSON banner/credit suppression pass. | Product adoption evidence for already-VERIFIED shared primitives. |
+| AC-d7, AC-d8 | Packed `hive --version` is exactly `hive v<package-version>\n` and matches Hive's package manifest; JSON version is one standard envelope with `version` and no extra output. | AC-d7 partial suite evidence; AC-d8 product evidence for shared primitive. |
+| AC-d9 | Hive snapshots cover 80/narrow columns, disabled color, bare, help, and version using the packed CLI. | Partial suite evidence only. |
+| AC-e5, AC-e6, AC-e7, AC-e8 | Hive contributes reviewed migration/runbook documentation, a configured three-platform workflow, a passing installed-tarball conformance script, and an independently reviewed non-stub/source-isolation audit. The native workflow is unpushed and has not run. | Hive implementation portion complete; native-run and multi-product suite portions remain pending. |
+| AC-e9 | Hive product documentation links the suite-wide normative matrix and documents only Hive-specific details. | Product link-target evidence for already-VERIFIED suite documentation. |
+| AC-e10 | Published Hive release/package URL and version containing adoption. Publication is not required to finish implementation verification, but remains required for PRD completion. | One of four required release proofs. |
+
+Hive close-out evidence: final QA is a clean PASS with zero Critical, Warning, or Suggestion finding; 54/54 focused tests and 97 files / 834/834 full tests pass. Security is PASS with no open Critical, High, or Medium finding and 68/68 security-focused tests pass. `npm run typecheck`, `npm run build`, `npm run test:packed-cli`, `npm audit --audit-level=high` (0 vulnerabilities), and `git diff --check` PASS. The packed script creates the npm tarball, installs it into an isolated temporary prefix, checks banner/credit/command presence/canonical help/version/JSON/unknown/status/telemetry/log failure behavior, and cleans up. Device dogfood used globally installed `@legioncodeinc/hive` 0.11.1: stale PID 104964 was terminated; the Windows scheduled-task action was confirmed as `service-daemon`; `/health` reported 0.11.1; a final identity-revalidated restart moved PID 110864 to PID 116892 and returned healthy; `hive logs` tailed the service log successfully. Native Ubuntu/macOS/Windows CI is configured but remains unexecuted for this unpushed revision, and the device install does not substitute for a published-release URL.
+
+Not supplied by Hive: AC-a1 (cli-kit export itself), AC-d3 (Honeycomb-specific reference requirement), AC-e1 (Honeycomb), AC-e2 (Doctor), and AC-e4 (Nectar).
 
 ## Dependency and wave plan
 
@@ -116,7 +155,8 @@
 | 2 — Observability primitives — DONE | AC-c2, AC-c5–c8: safe log options/follow/redaction, telemetry summary, and read-only seams. | typescript-node-worker-bee, security-worker-bee | Wave 1 output contract stable | Five observability criteria DONE; 23 focused tests plus full suite/type/build/package gates pass. |
 | 3 — Branding/help/version primitives — DONE | AC-d4–d6, AC-d8: pure banner/help rendering, color equivalence, JSON suppression, and version JSON. | typescript-node-worker-bee, quality-worker-bee | Wave 1 manifest stable | Four rendering criteria DONE; eight reference goldens and branding/reference tests pass. |
 | 4 — Documentation and packaging — VERIFIED | AC-e9; public exports, README/migration guidance, suite matrix, examples, declaration/tarball checks, and zero-runtime-dependency audit. | library-worker-bee, typescript-node-worker-bee, quality-worker-bee | Waves 1–3 stable | All 16 local rows VERIFIED; docs check, typecheck, 261 tests, build, packaging QA, zero-vulnerability audit, and pack dry-run pass. |
-| 5 — Scoped close-out / deferred product adoption | All 40 BLOCKED criteria: implementation PRs, packed CLI tests, native CI, cross-suite conformance, changelogs, and releases. | product maintainers, devops-worker-bee, quality-worker-bee | User authorizes product deployment | Scoped close-out is 16 VERIFIED / 40 BLOCKED / 0 DONE, OPEN, or IN PROGRESS. Required future proof remains recorded for every blocked row. |
+| 5 — Hive adoption — VERIFIED | Hive's full command surface and real adapters; retained Hive-owned commands; branding, help/version, JSON, lifecycle, registration, status/logs/telemetry, migration notes, packed conformance, security, and device dogfood. | Hive maintainer, security-worker-bee, quality-worker-bee | cli-kit Waves 0–4 verified; Hive rollout authorized | AC-e3 remains VERIFIED: final clean QA PASS with zero Critical/Warning/Suggestion, 54/54 focused and 834/834 full tests; security PASS with 68/68 focused tests and no open Critical/High/Medium; typecheck/build/packed/audit/diff gates and live 0.11.1 service/restart/log dogfood pass. Unpushed native three-OS CI and release evidence remain pending and do not change the blocked suite rows. |
+| 6 — Remaining product adoption / suite close-out — BLOCKED | Doctor, Honeycomb, and Nectar implementation; four-product conformance/native CI; all product releases. | remaining product maintainers, devops-worker-bee, quality-worker-bee | Hive Wave 5 verified and remaining deployments authorized | Every remaining blocked row has all product/suite/release proof; PRD-003 may then move to completed. |
 
 ## Summary counts
 
@@ -127,12 +167,13 @@
 | PRD-003b | 10 | 0 | 0 | 0 | 0 | 10 |
 | PRD-003c | 9 | 0 | 0 | 0 | 5 | 4 |
 | PRD-003d | 10 | 0 | 0 | 0 | 4 | 6 |
-| PRD-003e | 10 | 0 | 0 | 0 | 1 | 9 |
-| **Total** | **56** | **0** | **0** | **0** | **16** | **40** |
+| PRD-003e | 10 | 0 | 0 | 0 | 2 | 8 |
+| **Total** | **56** | **0** | **0** | **0** | **17** | **39** |
 
 ## Close-out gates for this scoped run
 
 - All 16 cli-kit-local rows are VERIFIED with durable local implementation/test/package evidence recorded in the QA report.
 - The cli-kit package must retain zero runtime dependencies, side-effect-free imports, ESM/Node constraints, explicit exports, declaration maps, and packed-artifact documentation.
 - The conformance harness must be usable by future product repositories without embedding product adapters or product-owned ASCII art in cli-kit.
-- The 40 BLOCKED rows remain explicitly deferred; no claim of fleet adoption or PRD-003 completion is permitted until their recorded future proof exists.
+- AC-e3 is VERIFIED. Hive evidence is recorded on blocked suite rows, but no suite-wide row changes status from Hive evidence alone.
+- The 39 `BLOCKED` rows remain explicitly deferred; no claim of suite adoption or PRD-003 completion is permitted until their recorded multi-product, native-CI, and release proof exists.
